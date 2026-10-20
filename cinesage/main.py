@@ -21,7 +21,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-try:
+if __package__:
     from .sentinel.detector_prompt import scan_prompt
     from .sentinel.detector_dataset import scan_dataset_record, scan_dataset_batch
     from .sentinel.detector_supplychain import verify_model_provenance, scan_repo
@@ -34,7 +34,7 @@ try:
         load_movies,
     )
     from .vapt_scanner import run_vapt_scan
-except ImportError:
+else:
     from sentinel.detector_prompt import scan_prompt
     from sentinel.detector_dataset import scan_dataset_record, scan_dataset_batch
     from sentinel.detector_supplychain import verify_model_provenance, scan_repo
