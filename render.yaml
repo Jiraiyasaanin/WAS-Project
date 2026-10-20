@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: cinesage-sentinel
+    name: cyber-defense
     runtime: python
     buildCommand: pip install -r requirements-deploy.txt
     startCommand: uvicorn cinesage.main:app --host 0.0.0.0 --port $PORT --no-server-header
