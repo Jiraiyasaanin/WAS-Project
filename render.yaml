@@ -3,7 +3,7 @@ services:
     name: cinesage-sentinel
     runtime: python
     buildCommand: pip install -r requirements-deploy.txt
-    startCommand: uvicorn cinesage.main:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn cinesage.main:app --host 0.0.0.0 --port $PORT --no-server-header
     envVars:
       - key: GROQ_API_KEY
         sync: false

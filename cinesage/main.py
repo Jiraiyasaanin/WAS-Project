@@ -12,10 +12,10 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from starlette.middleware.base import RequestResponseEndpoint
 import httpx
 from dotenv import load_dotenv
 
@@ -51,9 +51,34 @@ except ImportError:
 
 
 app = FastAPI(title="CineSage", version="2.2.0")
-app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
-)
+
+
+@app.middleware("http")
+async def add_security_headers(
+    request: Request,
+    call_next: RequestResponseEndpoint,
+):
+    response = await call_next(request)
+    response.headers["Strict-Transport-Security"] = "max-age=31536000"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: https:; "
+        "font-src 'self' data:; "
+        "connect-src 'self'; "
+        "object-src 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'; "
+        "frame-ancestors 'none'"
+    )
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = (
+        "camera=(), microphone=(), geolocation=()"
+    )
+    return response
 
 _stats = {
     "total_requests": 0,
@@ -691,4 +716,3 @@ async def index():
 async def api_vapt_scan(req: VAPTRequest):
     result = await run_vapt_scan(req.target_url, req.domain_context)
     return result
-
